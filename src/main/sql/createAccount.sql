@@ -1,4 +1,7 @@
-﻿CREATE SEQUENCE ACCOUNT_SEQ start 1000000 increment 1;
+﻿DROP TABLE IF EXISTS ACCOUNT;
+DROP SEQUENCE IF EXISTS ACCOUNT_SEQ;
+
+CREATE SEQUENCE ACCOUNT_SEQ start 1000000 increment 1;
 CREATE TABLE ACCOUNT (
 	"id" int8 NOT NULL PRIMARY KEY DEFAULT NEXTVAL('ACCOUNT_SEQ'),
 	"name" varchar(255) NOT NULL,
@@ -17,8 +20,6 @@ ALTER TABLE public.account ADD COLUMN "hasNewHash" boolean DEFAULT false;
 
 ALTER TABLE public.account ADD COLUMN "passwdNewHash" varchar(255);
 
-
---read https://www.postgresql.org/docs/9.3/static/pgcrypto.html#PGCRYPTO-HASH-SPEED-TABLE
 --run as superuser
 CREATE EXTENSION pgcrypto;
 
@@ -30,10 +31,10 @@ UPDATE ACCOUNT SET "passwdNewHash" = crypt('plainTextPasswd', gen_salt('bf', 12)
 ALTER TABLE ACCOUNT RENAME "passwdHash" TO "staleOldPasswdHash";
 
 --when everyone's happy
-ALTER TABLE public.account DROP COLUMN "staleOldPasswdHash";
+ALTER TABLE ACCOUNT DROP COLUMN "staleOldPasswdHash";
 
 --when all old passwords removed
-ALTER TABLE public.account DROP COLUMN "hasNewHash";
+ALTER TABLE ACCOUNT DROP COLUMN "hasNewHash";
 
 
 
